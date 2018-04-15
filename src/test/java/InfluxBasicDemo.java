@@ -21,7 +21,14 @@ public class InfluxBasicDemo {
 
     public InfluxBasicDemo() {
         this.influxDB = InfluxDBFactory.connect("http://localhost:8086");
-        influxDB.setLogLevel(InfluxDB.LogLevel.FULL);
+        influxDB.setLogLevel(InfluxDB.LogLevel.BASIC);
+    }
+
+    @Test
+    public void contactDatabase() {
+        Pong response = this.influxDB.ping();
+        assertTrue(!"unknown".equalsIgnoreCase(response.getVersion()));
+        System.out.println("Ping response: " + response.getVersion());
     }
 
     @Test
@@ -29,13 +36,6 @@ public class InfluxBasicDemo {
         influxDB.query(new Query("CREATE DATABASE javademo", "mydb"));
         influxDB.query(new Query("CREATE RETENTION POLICY \"one_day_only\" ON \"javademo\" DURATION 23h60m REPLICATION 1 DEFAULT", "javademo"));
 
-    }
-
-    @Test
-    public void databaseIsUp() {
-        Pong response = this.influxDB.ping();
-        assertTrue(!"unknown".equalsIgnoreCase(response.getVersion()));
-        System.out.println("Ping response: " + response.getVersion());
     }
 
     @Test
@@ -84,6 +84,7 @@ public class InfluxBasicDemo {
 
         batchPoints.point(point1);
         batchPoints.point(point2);
+
         influxDB.write(batchPoints);
         influxDB.disableBatch();
     }
@@ -94,8 +95,10 @@ public class InfluxBasicDemo {
         var resultMapper = new InfluxDBResultMapper();
         var memoryPoints = resultMapper.toPOJO(queryResult, MemoryPoint.class);
         assertEquals(3, memoryPoints.size());
-        assertTrue(4523693L == memoryPoints.get(0).getFree());
 
+        for (var point : memoryPoints) {
+            System.out.println(point);
+        }
     }
 
     @Test

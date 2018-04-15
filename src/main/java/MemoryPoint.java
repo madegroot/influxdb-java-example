@@ -71,4 +71,16 @@ public class MemoryPoint {
     public void setBuffer(Long buffer) {
         this.buffer = buffer;
     }
+
+    @Override
+    public String toString() {
+        return "MemoryPoint{" +
+                "time=" + time +
+                ", application='" + application + '\'' +
+                ", environment='" + environment + '\'' +
+                ", free=" + free +
+                ", used=" + used +
+                ", buffer=" + buffer +
+                '}';
+    }
 }
