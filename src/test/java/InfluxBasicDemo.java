@@ -12,7 +12,7 @@ import org.junit.runners.MethodSorters;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertFalse;
 
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class InfluxBasicDemo {
@@ -27,7 +27,7 @@ public class InfluxBasicDemo {
     @Test
     public void contactDatabase() {
         Pong response = this.influxDB.ping();
-        assertTrue(!"unknown".equalsIgnoreCase(response.getVersion()));
+        assertFalse("unknown".equalsIgnoreCase(response.getVersion()));
         System.out.println("Ping response: " + response.getVersion());
     }
 
@@ -35,7 +35,6 @@ public class InfluxBasicDemo {
     public void createDatabase() {
         influxDB.query(new Query("CREATE DATABASE javademo", "mydb"));
         influxDB.query(new Query("CREATE RETENTION POLICY \"one_day_only\" ON \"javademo\" DURATION 23h60m REPLICATION 1 DEFAULT", "javademo"));
-
     }
 
     @Test
