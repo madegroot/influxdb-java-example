@@ -1,0 +1,21 @@
+package influxdemo.example.crypto.component;
+
+import influxdemo.example.crypto.InfluxCryptoApplication;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
+
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT, classes = InfluxCryptoApplication.class)
+public class InfluxClientTest {
+
+    @Autowired
+    private InfluxClient influxClient;
+
+    @Test
+    public void createCryptoDatabase() {
+        influxClient.createCryptoDatabase();
+    }
+}

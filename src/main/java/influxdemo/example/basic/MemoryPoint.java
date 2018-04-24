@@ -1,3 +1,5 @@
+package influxdemo.example.basic;
+
 import org.influxdb.annotation.Column;
 import org.influxdb.annotation.Measurement;
 
