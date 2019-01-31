@@ -5,7 +5,6 @@ import okhttp3.OkHttpClient;
 import org.influxdb.InfluxDB;
 import org.influxdb.InfluxDBFactory;
 import org.influxdb.dto.BatchPoints;
-import org.influxdb.dto.Point;
 import org.influxdb.dto.Pong;
 import org.influxdb.dto.Query;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +19,10 @@ public class InfluxClient {
 
     @Value("${influx.url}")
     private String url;
+    @Value("${influx.username}")
+    private String username;
+    @Value("${influx.password}")
+    private String password;
     @Value("${influx.loglevel}")
     private String logLevel = "BASIC";
     @Value("${influx.connectTimeout}")
@@ -42,7 +45,7 @@ public class InfluxClient {
                 .writeTimeout(readTimeout, TimeUnit.SECONDS)
                 .readTimeout(writeTimeout, TimeUnit.SECONDS);
 
-        influxDB = InfluxDBFactory.connect(url, client);
+        influxDB = InfluxDBFactory.connect(url, username, password, client);
         influxDB.setLogLevel(getLogLevel(logLevel));
         if (gzipEnabled) {
             influxDB.enableGzip();
@@ -58,21 +61,8 @@ public class InfluxClient {
                 .database("crypto")
                 .build();
 
-        rates.forEach(rate -> batchPoints.point(getPoint(rate)));
+        rates.forEach(rate -> batchPoints.point(rate.toPoint()));
         influxDB.write(batchPoints);
-    }
-
-    private Point getPoint(Rate rate) {
-        var ticker = rate.getTicker();
-        return Point.measurement("currency")
-                .time(rate.getTimestamp(), TimeUnit.SECONDS)
-                .tag("coin", ticker.getBase())
-                .tag("target", ticker.getTarget())
-                .addField("price", ticker.getPrice())
-                .addField("price", Float.valueOf(ticker.getPrice()))
-                .addField("volume", Float.valueOf(ticker.getVolume()))
-                .addField("change", Float.valueOf(ticker.getChange()))
-                .build();
     }
 
     private InfluxDB.LogLevel getLogLevel(String input) {

@@ -1,5 +1,10 @@
 package influxdemo.example.crypto.domain;
 
+import org.influxdb.dto.Point;
+import org.springframework.util.StringUtils;
+
+import java.util.concurrent.TimeUnit;
+
 public class Rate {
 
     private Ticker ticker;
@@ -31,5 +36,25 @@ public class Rate {
                 ", success=" + success +
                 ", error='" + error + '\'' +
                 '}';
+    }
+
+    public static Point toPoint(Rate rate) {
+        return rate.toPoint();
+    }
+
+    public Point toPoint() {
+        return Point.measurement("currency")
+                .time(timestamp, TimeUnit.SECONDS)
+                .tag("coin", ticker.getBase())
+                .tag("target", ticker.getTarget())
+                .addField("price", ticker.getPrice())
+                .addField("price", valueOf(ticker.getPrice()))
+                .addField("volume", valueOf(ticker.getVolume()))
+                .addField("change", valueOf(ticker.getChange()))
+                .build();
+    }
+
+    private Float valueOf(String input) {
+        return StringUtils.isEmpty(input) ? null : Float.valueOf(input);
     }
 }
